@@ -13,6 +13,11 @@ nbproject/
 wp-content/uploads
 wp-settings.php
 settings.php
+settings.local.php
 private/
 *.psd
-data/*.sql
+*.sql
+*.mysql
+.gitignore
+.cvsignore
+SQL/
