@@ -3,17 +3,18 @@
 ## Pre-requisites
 
 - Sudo access on your remote server (preferably passwordless)
-- If you can't `make`, you'll need to just copy files in to place + chmod them
 - @ToDo: List other prerequisites
 
 
 ## Installation
 
-1) Place the local scripts into your $PATH and make them executable:
+1) Place the local scripts into your bin dir and make them executable:
    ```
    cp ./{gitexport-latest-only.sh,gitexport-whole-repo.sh,gitexport-deploy.sh,gitexport-since-when.sh} ~/bin/
    chmod +x ~/bin/{gitexport-latest-only.sh,gitexport-whole-repo.sh,gitexport-deploy.sh,gitexport-since-when.sh}
    ```
+   Assuming `~/bin/` exists, and is in your `$PATH` environment variable.
+
 2) Also put the exclusions file in place (it lives with the scripts, but doesn't need to be executable):
    ```
    cp -i gitexport.exclusions.example ~/bin/gitexport.exclusions
