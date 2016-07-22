@@ -9,20 +9,23 @@
 
 ## Installation
 
-1) Install local scripts:
+1) Place the local scripts into your $PATH and make them executable:
    ```
-   make -s install
+   cp ./{gitexport-latest-only.sh,gitexport-whole-repo.sh,gitexport-deploy.sh,gitexport-since-when.sh} ~/bin/
+   chmod +x ~/bin/{gitexport-latest-only.sh,gitexport-whole-repo.sh,gitexport-deploy.sh,gitexport-since-when.sh}
    ```
-   If you can't `make`, just copy all the .sh files into your local `bin` dir and `chmod +x` them
-
-2) Install the remote script:
+2) Also put the exclusions file in place (it lives with the scripts, but doesn't need to be executable):
+   ```
+   cp -i gitexport.exclusions.example ~/bin/gitexport.exclusions
+   ```
+ 
+3) Install the remote script on any servers you want to be able to deploy to:
    ```
    ssh REMOTEHOST 'test -d ~/bin/ || mkdir ~/bin/'
    scp ./deploy-local.sh REMOTEHOST:~/bin/
    ssh REMOTEHOST 'chmod +x ~/bin/deploy-local.sh'
    ```
-   Upload the remote script to each host you want to be able to deploy to.
-
+ 
 ## The Scripts
 - `gitexport-latest-only.sh [remotehost]`
     - Exports only the files changed in the most recent commit
@@ -103,12 +106,11 @@ Then, THIS is the `DEPLOY_DIR` you need to use:
   When a .gitexport.deploysettings or .gitexport.deploysettings.REMOTEHOST file is found in the dir where gitexport-sincewhen.sh was executed, the tar file will be moved in to place on the server and extracted as the specified user.
 
 
-## Script removal
+## Removal
 
 Uninstalling is just the reverse of installation:
 ```
-cd path/to/this/repo
-make -s uninstall
+rm ~/bin/{gitexport-latest-only.sh,gitexport-whole-repo.sh,gitexport-deploy.sh,gitexport-since-when.sh,gitexport.exclusions}
 ssh REMOTEHOST 'rm ~/bin/deploy-local.sh'
 ```
 
