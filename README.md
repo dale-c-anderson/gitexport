@@ -19,6 +19,7 @@
    ```
    ssh REMOTEHOST 'test -d ~/bin/ || mkdir ~/bin/'
    scp ./deploy-local.sh REMOTEHOST:~/bin/
+   ssh REMOTEHOST 'chmod +x ~/bin/deploy-local.sh'
    ```
    Upload the remote script to each host you want to be able to deploy to.
 
@@ -122,3 +123,5 @@ ssh REMOTEHOST 'rm ~/bin/deploy-local.sh'
 
 2) Deal with / fix the paths issue. It's confusing as hell.
 
+3) After merging the deploy files, change deploy so it uploads itself, execute, and then removes itself
+   as part of the deploy process, so it doesnt need to live on the remote server.
