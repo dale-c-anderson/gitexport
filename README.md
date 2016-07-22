@@ -3,7 +3,7 @@
 ## Pre-requisites
 
 - Sudo access on your remote server (preferably passwordless)
-- @ToDo: List other prerequisites
+- @Todo: List other prerequisites
 
 
 ## Installation
@@ -57,7 +57,7 @@ All of the scripts accept a hostname as a final argument. If a hostname is provi
 the script will attempt to upload the exported tar file to the server. If the uplaod is
 successful, the local tar file is removed.
 
-## Optional per-repository config files
+## Configuration
 If a `.gitexport.deploysettings` file is found in your local repository root, the config
 values in it will be used to move files into place and set ownerhsip on the
 remote server.
