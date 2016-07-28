@@ -58,6 +58,7 @@ SCRIPTDIR="$(dirname "$0")"
 EXCLUSIONS="$SCRIPTDIR/gitexport.exclusions"
 
 # Get rid of any previous garbage lying around
+# @TODO: Should we ask before removing files?
 if [ -f "$TARFILE" ]; then  
   echo "Removing old $TARFILE"
   rm "$TARFILE"
@@ -70,9 +71,9 @@ fi
 # Export the files changed since <hash> and now: Skip listing deleted or the old names of files if they were renamed.
 if [ -f "$EXCLUSIONS" ]; then
   echo "Excluding paths from $EXCLUSIONS"
-  git diff --diff-filter=ACMRT --name-only "$SINCEWHEN" HEAD| tar -T - --transform "s,^,$REPO/,S" -cf "$TARFILE" --exclude-from="$EXCLUSIONS"
+  git diff --diff-filter=ACMRT --name-only "$SINCEWHEN" HEAD| tar -T - -cf "$TARFILE" --exclude-from="$EXCLUSIONS"
 else
-  git diff --diff-filter=ACMRT --name-only "$SINCEWHEN" HEAD| tar -T - --transform "s,^,$REPO/,S" -cf "$TARFILE"
+  git diff --diff-filter=ACMRT --name-only "$SINCEWHEN" HEAD| tar -T - -cf "$TARFILE"
 fi
 echo "Saved to $TARFILE"
 

@@ -5,17 +5,17 @@ if [ $# -ne 3 ]; then
   echo "Requires sudo privileges."
   echo "Moves the deploy file to the target dir, sets the correct owner, extracts the bundle, and then removes it."
   echo "Usage:   $(basename "$0") <deployfile.tar.gz> </full/path/to/dest/dir> <owner>"
-  echo "Example: $(basename "$0") 'telecomstorebox-LATEST.tgz' '/home/acro/apps/' 'acro'"
+  echo "Example: $(basename "$0") 'telecomstorebox-LATEST.tgz' '/home/acro/apps/telecomstorebox' 'acro'"
   exit 0
 fi
 
-# Deploy dir is actually the parent of the repo being deployed.
 deployfile="$1"
 if [ ! -f "$deployfile" ]; then
   echo "Deploy file does not exist: $deployfile"
   exit 1
 fi
 
+# @TODO: IS_TGZ isn't actually used....
 if [[ "$deployfile" == *.tar.gz ]]; then
   IS_TGZ=1
 elif [[ "$deployfile" == *.tgz ]]; then
@@ -44,6 +44,7 @@ sudo mv "$deployfile" "$deploydir/" || {
 }
 echo "OK"
 
+# @TODO: Is this step actually necessary? I think running tar as the specified user is what sets permissions as the files are being extracted.
 echo -n "Setting ownership of $deployfile to $deployuser ... "
 sudo chown "$deployuser": "$deploydir/$deployfile"|| {
   echo "Could not chown deploy file. Aborting."
@@ -51,6 +52,7 @@ sudo chown "$deployuser": "$deploydir/$deployfile"|| {
 }
 echo "OK"
 
+# @TODO: Moving the tar file isn't necessary - you can use the -C switch to extract contents to a different directory.
 echo "Extracting $deployfile... "
 sudo -u "$deployuser" -H sh -c "cd $deploydir && tar xzfv $deployfile" || {
   echo "Could not extract deploy file to target. Deploy failed."

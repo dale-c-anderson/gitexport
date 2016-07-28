@@ -64,7 +64,7 @@ remote server.
 
 A `.gitexport.deploysettings` is a bash include, so white space is not trivial. It should contain the following:
 ```
-DEPLOY_DIR=/parent/path/of/repo # Required *** See note about paths below ***
+DEPLOY_DIR=/destination/path    # Required
 DEPLOY_USER=correctowner        # Required
 DEPLOY_HOST=server.example.com  # Optional: Use this if the hostname of your target does not match the hostname you
                                 # specify or if you want deployment to happen automatically without having to specify a
@@ -73,19 +73,6 @@ DEPLOY_HOST=server.example.com  # Optional: Use this if the hostname of your tar
 If a `.gitexport.deploysettings.REMOTEHOST` file is found in a repository root, and
 `REMOTEHOST` matches the name of the remote host used in the gitexport command, that
 file will be used instead of the generic deploysettings file.
-
-## Paths (pay attention; you'll probably get this wrong)
-The `DEPLOY_DIR` is **NOT** the path to the root of the repository. It is the **PARENT** of the repository on the remote host.
-
-If your local repository and remote final destination paths look like this:
-```
-/home/me/repos/company_a/project_1  <-- path to local repo root
-/home/company_a/www/project_1       <-- corresponding remote path
-```
-Then, THIS is the `DEPLOY_DIR` you need to use:
-```
-/home/company_a/www                 <-- THIS is the correct DEPLOY_DIR you need to use
-```
 
 ## Usage examples
 - Tar up the changes since the specified commit on the current branch, and place the tar file above the root of the repo:
@@ -100,7 +87,7 @@ Then, THIS is the `DEPLOY_DIR` you need to use:
 
 - Tar, upload, and deploy the files (with their correct location & ownership) on the remote host:
   ```
-  me@local:~/repo$ echo "DEPLOY_DIR=/home/someuser/www" > .gitexport.deploysettings.REMOTEHOST
+  me@local:~/repo$ echo "DEPLOY_DIR=/home/someuser/www/project" > .gitexport.deploysettings.REMOTEHOST
   me@local:~/repo$ echo "DEPLOY_USER=someuser" >> .gitexport.deploysettings.REMOTEHOST
   me@local:~/repo$ gitexport-sincewhen.sh c329b5dd4d3cabaae5c3d09ba313f4a506f3281a REMOTEHOST
   ```
@@ -117,14 +104,14 @@ ssh REMOTEHOST 'rm ~/bin/deploy-local.sh'
 
 
 
-## TODO
-1) Merge both 'deploy' files in to a single script to reduce the confusion.
-   The same script will live on local and remote machines, but will behave differently
-   depending on the context. The name of the script that lives on the remote end is a little misleading;
-   You'd think 'deploy-local.sh' is a script that should live on your machine, but
-   in fact 'local' refers to the fact that it doesn't reach out to any remote hosts.
+## TODOs
+- Merge `gitexplort-deploy.sh` and `deploy-local.sh` in to a single script to reduce the confusion.
+  The same script will live on local and remote machines, but will behave differently
+  depending on the context. The name of the script that lives on the remote end is a little misleading;
+  You'd think 'deploy-local.sh' is a script that should live on your machine, but
+  in fact 'local' refers to the fact that it doesn't reach out to any remote hosts.
 
-2) Deal with / fix the paths issue. It's confusing as hell.
+- After merging the deploy files, change deploy so it uploads itself, executes, then removes itself
+  as part of the deploy process, so it doesn't need to live on the remote server.
 
-3) After merging the deploy files, change deploy so it uploads itself, execute, and then removes itself
-   as part of the deploy process, so it doesnt need to live on the remote server.
+- Store settings in git config instead of using (and having go ignore).gitexport* files

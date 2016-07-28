@@ -41,12 +41,13 @@ fi
 
 
 # Use the current directory as the name of the repo to tar up.
-REPO=${PWD##*/}
+REPO="${PWD##*/}"
 TARFILE="../$REPO-HEAD.tar"
 SCRIPTDIR="$(dirname "$0")"
 EXCLUSIONS="$SCRIPTDIR/gitexport.exclusions"
 
 # Get rid of any previous garbage lying around
+# @TODO: Should we ask before removing files?
 if [ -f "$TARFILE" ]; then
   echo "Removing old $TARFILE"
   rm "$TARFILE"
@@ -59,14 +60,14 @@ fi
 # export the entire git repository
 if [ -f "$EXCLUSIONS" ]; then
   echo "Excluding paths from $EXCLUSIONS"
-  git ls-tree --name-only --full-tree -r HEAD| tar -T - --transform "s,^,$REPO/,S" -cf "$TARFILE" --exclude-from="$EXCLUSIONS"
+  git ls-tree --name-only --full-tree -r HEAD| tar -T - -cf "$TARFILE" --exclude-from="$EXCLUSIONS"
 else
-  git ls-tree --name-only --full-tree -r HEAD| tar -T - --transform "s,^,$REPO/,S" -cf "$TARFILE"
+  git ls-tree --name-only --full-tree -r HEAD| tar -T - -cf "$TARFILE"
 fi
 echo "Saved to $TARFILE"
 
 
-# If the HOST argument is supplied, the push the repository up to my home directory on that server.
+# If the HOST argument is supplied, push the repository up to user's home directory of that server.
 if [[ "$HOST" ]]; then
   gzip "$TARFILE"
   DEPLOY=0
