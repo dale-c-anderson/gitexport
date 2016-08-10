@@ -1,9 +1,14 @@
 # GitExport (aka Poor man's deploy)
 
+## What is it?
+A quick way to tar up a bundle of committed files from your local repository, and optionally scp them up and extract them to the right place and with the right ownership on a development, staging, or production server. There are 3 export options currently available:
+ - Export only the files affected in the most recent commit
+ - Export only the files affected after the commit you specify
+ - Export all the files in the repo
+
 ## Pre-requisites
 
 - Sudo access on your remote server (preferably passwordless)
-- @Todo: List other prerequisites
 
 
 ## Installation
@@ -32,7 +37,7 @@
     - Exports only the files changed in the most recent commit
 
 - `gitexport-since-when.sh <hash-value> [remotehost]`
-    - Exports all the files modified or added since the specified hash value.
+    - Exports all the files modified or added AFTER the commit of the specified hash value
 
 - `gitexport-whole-repo.sh [remotehost]`
     - Exports the entire repo, minus any paths matched in the exclusions file.
@@ -115,3 +120,5 @@ ssh REMOTEHOST 'rm ~/bin/deploy-local.sh'
   as part of the deploy process, so it doesn't need to live on the remote server.
 
 - Store settings in git config instead of using (and having go ignore).gitexport* files
+
+- Change since-when to be inclusive of the specified commit
