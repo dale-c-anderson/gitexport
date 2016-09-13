@@ -11,23 +11,26 @@ A quick way to tar up a bundle of committed files from your local repository, an
 - Sudo access on your remote server (preferably passwordless)
 
 ## Installation
-0) Download or clone this repo, and cd into the dir: 
+1) Download or clone this repo, and cd into the dir: 
    ```
    git clone git@github.com:dale-c-anderson/gitexport.git gitexport
    cd gitexport
    ```
   
-1) Place the local scripts into your bin dir and make them executable (assuming you have a `~/bin/`, and it's in your `$PATH`):
+2) Copy local files into your path and make them executable (assuming you have a `~/bin/`, and it's in your `$PATH`):
+
+   ... if you have `make`: 
+   ```
+   make -s install
+   ```
+   
+   ... if you don't have `make`:
    ```
    cp ./{gitexport-latest-only.sh,gitexport-whole-repo.sh,gitexport-deploy.sh,gitexport-since-when.sh} ~/bin/
    chmod +x ~/bin/{gitexport-latest-only.sh,gitexport-whole-repo.sh,gitexport-deploy.sh,gitexport-since-when.sh}
-   ```
-
-2) Also put the exclusions file in place (it lives with the scripts, but doesn't need to be executable):
-   ```
    cp -i gitexport.exclusions.example ~/bin/gitexport.exclusions
    ```
- 
+
 3) Install the remote script on any servers you want to be able to deploy to:
    ```
    ssh REMOTEHOST 'test -d ~/bin/ || mkdir ~/bin/'
