@@ -106,9 +106,9 @@ if [[ "$HOST" ]]; then
     echo "If you create a '.gitexport.deploysettings' or '.gitexport.deploysettings.$HOST' file in the current directory, "
     echo "this script can deploy the bundle on the remote server for you when you upload it."
     echo "The following Bash variables need to be defined in the settings file:"
-    echo "DEPLOY_HOST=server.example.com  # if hostname of your target does not match the host you specified"
-    echo "DEPLOY_DIR=/parent/path/of/repo # required"
-    echo "DEPLOY_USER=correctowner        # required"
+    echo "DEPLOY_HOST=server.example.com           # optional unless the hostname of your target does not match the host you specified"
+    echo "DEPLOY_DIR=/remote/path/to/working/tree  # required"
+    echo "DEPLOY_USER=correctowner                 # required"
     echo ""
     echo "Uploading $TARFILE.gz to $HOST ..."
     scp "$TARFILE.gz" "$HOST":~/ || {
