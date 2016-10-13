@@ -11,7 +11,7 @@ nbproject/
 .project
 *.log
 wp-content/uploads
-wp-settings.php
+wp-config.php
 settings.php
 settings.local.php
 private/
