@@ -25,4 +25,3 @@ install: uninstall
 uninstall:
 
 	$(foreach file,$(LOCAL_SCRIPTS), if [ -f "$(LOCAL_BIN_DIR)/$(file)" ]; then rm -fv "$(LOCAL_BIN_DIR)/$(file)"; fi;)
-	$(foreach file,$(CONFIGS), if [ -f "$(LOCAL_BIN_DIR)/$(file)" ]; then rm -fv "$(LOCAL_BIN_DIR)/$(file)"; fi;)
