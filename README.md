@@ -31,13 +31,6 @@ chmod +x ~/bin/{gitexport-latest-only.sh,gitexport-whole-repo.sh,gitexport-deplo
 cp -i gitexport.exclusions.example ~/bin/gitexport.exclusions
 ```
 
-3) Install the remote script on any servers you want to be able to deploy to:
-```
-ssh REMOTEHOST 'test -d ~/bin/ || mkdir ~/bin/'
-scp ./deploy-local.sh REMOTEHOST:~/bin/
-ssh REMOTEHOST 'chmod +x ~/bin/deploy-local.sh'
-```
-
 ## The Scripts
 - `gitexport-latest-only.sh [remotehost]`
     - Exports only the files changed in the most recent commit
@@ -51,8 +44,8 @@ ssh REMOTEHOST 'chmod +x ~/bin/deploy-local.sh'
 - `gitexport-deploy.sh <remotehost>`
     - Called by the above 3 scripts to push the tar file up to the remote server, and optionally put the files in place on the remote host.
 
-- `deploy-local.sh <@args>`:
-    - Executed by `gitexport-deploy.sh` on the remote host.
+- `gitexport-remote-deploy-tool.sh <@args>`:
+    - Uploaded to the remote host and executed by `gitexport-deploy.sh` on the remote host. Not actually used locally.
 
 ## General behaviour
 - Scripts need to be executed from the root of whatever repository they're operating on.
@@ -121,9 +114,6 @@ ssh REMOTEHOST 'rm ~/bin/deploy-local.sh'
   depending on the context. The name of the script that lives on the remote end is a little misleading;
   You'd think 'deploy-local.sh' is a script that should live on your machine, but
   in fact 'local' refers to the fact that it doesn't reach out to any remote hosts.
-
-- After merging the deploy files, change deploy so it uploads itself, executes, then removes itself
-  as part of the deploy process, so it doesn't need to live on the remote server.
 
 - Store settings in git config instead of using (and having go ignore).gitexport* files
 
