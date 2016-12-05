@@ -1,5 +1,7 @@
 #!/bin/bash
 
+REMOTE_DEPLOY_TOOL="gitexport-remote-deploy-tool.sh"
+REMOTE_DEPLOY_TOOL_SOURCE="https://raw.githubusercontent.com/dale-c-anderson/gitexport/master/$REMOTE_DEPLOY_TOOL"
 REMOTE_DEPLOY_TOOL_CHECKSUM='4e8d3ef5dc7ba511aa22f1b83cc83b69'
 
 if [ $# -ne 2 ]; then
@@ -65,10 +67,10 @@ fi
 # Download the remote deploy script. Also check the sum for safety.
 # We do this (instead of using the local version) because (1) the local version isn't
 # actually used locally, and (2) we don't know where it was installed on the local machine.
-echo "Grabbing gitexport-remote-deploy-tool.sh..."
-REMOTE_DEPLOY_TOOL=$("mktemp")
-wget -O "$REMOTE_DEPLOY_TOOL" "https://raw.githubusercontent.com/dale-c-anderson/gitexport/master/deploy-local.sh"
-CHECKSUM="$(md5sum "$REMOTE_DEPLOY_TOOL"| awk '{print $1}')"
+echo "Grabbing $REMOTE_DEPLOY_TOOL..."
+REMOTE_TOOL_TEMP=$("mktemp")
+wget -O "$REMOTE_TOOL_TEMP" "$REMOTE_DEPLOY_TOOL_SOURCE"
+CHECKSUM="$(md5sum "$REMOTE_TOOL_TEMP"| awk '{print $1}')"
 if [[ "$CHECKSUM" != "$REMOTE_DEPLOY_TOOL_CHECKSUM" ]]; then
   echo -n "Warning: Checksum failed. Do you wish to continue? [y/N] "
   read -r CONFIRM
@@ -87,7 +89,7 @@ scp "$TGZFILE" "$DEPLOYTARGET":~/ || {
 
 # Upload the remote deploy script
 echo "Pushing up remote deploy tool..."
-scp "$REMOTE_DEPLOY_TOOL" "$DEPLOYTARGET:~/gitexport-remote-deploy-tool.sh" || {
+scp "$REMOTE_TOOL_TEMP" "$DEPLOYTARGET:~/$REMOTE_DEPLOY_TOOL" || {
   echo "Upload failed."
   exit 1
 }
@@ -95,7 +97,7 @@ scp "$REMOTE_DEPLOY_TOOL" "$DEPLOYTARGET:~/gitexport-remote-deploy-tool.sh" || {
 # Execute the remote deploy script, and then remove it.
 # shellcheck disable=SC2088
 # shellcheck disable=SC2029
-ssh -t "$DEPLOY_HOST" "chmod +x ~/gitexport-remote-deploy-tool.sh && ~/gitexport-remote-deploy-tool.sh '~/$(basename "$TGZFILE")' '$DEPLOY_DIR' '$DEPLOY_USER'; rm ~/gitexport-remote-deploy-tool.sh"
+ssh -t "$DEPLOY_HOST" "chmod +x './$REMOTE_DEPLOY_TOOL' && ./$REMOTE_DEPLOY_TOOL './$(basename "$TGZFILE")' '$DEPLOY_DIR' $DEPLOY_USER; rm './$REMOTE_DEPLOY_TOOL'"
 SSHRESULT=$?
 echo "$(basename "$0") finished with result: $SSHRESULT"
 exit $SSHRESULT
