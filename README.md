@@ -7,8 +7,11 @@ A quick way to tar up a bundle of committed files from your local repository, an
  - Export all the files in the repo
 
 ## Pre-requisites
+- Deploying requires SSH and Sudo access on your remote server. I have only used this in passwordless enviornments. Can't say what will happen if you need to supply a password.
+- If all you're doing is exporting to tgz files, then you shouldn't need anything else.
 
-- Sudo access on your remote server (preferably passwordless)
+## Compatibility 
+- I've used this to deploy from Ubuntu 14, to Ubuntu 12, Ubuntu 14 and RHEL 6 servers. If you have good experience in other environments, let me know.
 
 ## Installation
 1) Download or clone this repo, and cd into the dir:
@@ -42,10 +45,10 @@ cp -i gitexport.exclusions.example ~/bin/gitexport.exclusions
     - Exports the entire repo, minus any paths matched in the exclusions file.
 
 - `gitexport-deploy.sh <remotehost>`
-    - Called by the above 3 scripts to push the tar file up to the remote server, and optionally put the files in place on the remote host.
+    - Is called by the above 3 scripts to push the tar file and remote tool up to the remote server, and optionally puts the files in place on the remote end.
 
 - `gitexport-remote-deploy-tool.sh <@args>`:
-    - Uploaded to the remote host and executed by `gitexport-deploy.sh` on the remote host. Not actually used locally.
+    - Gets uploaded to the remote server and executed by `gitexport-deploy.sh` on the remote host. Is not actually used locally.
 
 ## General behaviour
 - Scripts need to be executed from the root of whatever repository they're operating on.
