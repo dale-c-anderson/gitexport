@@ -112,12 +112,6 @@ ssh REMOTEHOST 'rm ~/bin/deploy-local.sh'
 
 
 ## TODOs
-- Merge `gitexplort-deploy.sh` and `deploy-local.sh` in to a single script to reduce the confusion.
-  The same script will live on local and remote machines, but will behave differently
-  depending on the context. The name of the script that lives on the remote end is a little misleading;
-  You'd think 'deploy-local.sh' is a script that should live on your machine, but
-  in fact 'local' refers to the fact that it doesn't reach out to any remote hosts.
-
 - Store settings in git config instead of using (and having go ignore).gitexport* files
 
 - Change since-when to be inclusive of the specified commit
