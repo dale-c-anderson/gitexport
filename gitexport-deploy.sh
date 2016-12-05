@@ -1,5 +1,7 @@
 #!/bin/bash
 
+REMOTE_DEPLOY_TOOL_CHECKSUM='4e8d3ef5dc7ba511aa22f1b83cc83b69'
+
 if [ $# -ne 2 ]; then
   echo "Usage:  $(basename "$0") <gitExport.tar.gz> <targethost>"
   exit 0
@@ -60,14 +62,40 @@ if [[ ! "$DEPLOY_USER" ]]; then
   exit 1
 fi
 
-# Try uploading the file
-echo "Scp'ing..."
+# Download the remote deploy script. Also check the sum for safety.
+# We do this (instead of using the local version) because (1) the local version isn't
+# actually used locally, and (2) we don't know where it was installed on the local machine.
+echo "Grabbing gitexport-remote-deploy-tool.sh..."
+REMOTE_DEPLOY_TOOL=$("mktemp")
+wget -O "$REMOTE_DEPLOY_TOOL" "https://raw.githubusercontent.com/dale-c-anderson/gitexport/master/deploy-local.sh"
+CHECKSUM="$(md5sum "$REMOTE_DEPLOY_TOOL"| awk '{print $1}')"
+if [[ "$CHECKSUM" != "$REMOTE_DEPLOY_TOOL_CHECKSUM" ]]; then
+  echo -n "Warning: Checksum failed. Do you wish to continue? [y/N] "
+  read -r CONFIRM
+  if [[ "$CONFIRM" != "y" ]]; then
+    echo "Exiting."
+    exit 1
+  fi
+fi
+
+# Upload the bundle
+echo "Scp'ing bundled files..."
 scp "$TGZFILE" "$DEPLOYTARGET":~/ || {
   echo "Upload failed."
   exit 1
 }
 
-# Let it rip!
-ssh -t "$DEPLOY_HOST" "~/bin/deploy-local.sh '$(basename "$TGZFILE")' '$DEPLOY_DIR' '$DEPLOY_USER'"
+# Upload the remote deploy script
+echo "Pushing up remote deploy tool..."
+scp "$REMOTE_DEPLOY_TOOL" "$DEPLOYTARGET:~/gitexport-remote-deploy-tool.sh" || {
+  echo "Upload failed."
+  exit 1
+}
+
+# Execute the remote deploy script, and then remove it.
+# shellcheck disable=SC2088
+# shellcheck disable=SC2029
+ssh -t "$DEPLOY_HOST" "chmod +x ~/gitexport-remote-deploy-tool.sh && ~/gitexport-remote-deploy-tool.sh '~/$(basename "$TGZFILE")' '$DEPLOY_DIR' '$DEPLOY_USER'; rm ~/gitexport-remote-deploy-tool.sh"
 SSHRESULT=$?
+echo "$(basename "$0") finished with result: $SSHRESULT"
 exit $SSHRESULT
