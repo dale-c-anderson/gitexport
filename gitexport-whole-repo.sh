@@ -80,6 +80,7 @@ if [[ "$HOST" ]]; then
   if [ $DEPLOY -eq 1 ]; then
     echo "Deploying $TARFILE.gz to $HOST..."
     gitexport-deploy.sh "$TARFILE.gz" "$HOST"
+    LASTEXIT=$?
   else
     echo ""
     echo "If you create a '.gitexport.deploysettings' or '.gitexport.deploysettings.$HOST' file in the current directory, "
@@ -94,7 +95,9 @@ if [[ "$HOST" ]]; then
       echo "upload failed."
       exit 1
     }
+    LASTEXIT=0
   fi
-  rm "$TARFILE.gz"
-  echo "Removed $TARFILE.gz"
+  if [ $LASTEXIT -eq 0 ]; then
+    rm -v "$TARFILE.gz"
+  fi
 fi

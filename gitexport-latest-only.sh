@@ -70,7 +70,7 @@ echo "Saved to $TARFILE"
 # Deleted files:
 DELETED_FILES=$(git diff --name-only --diff-filter=D HEAD^ HEAD)
 DELETED_FILE_COUNT=$(echo -n "$DELETED_FILES"|wc -l)
-if [ $DELETED_FILE_COUNT -gt 0 ]; then
+if [ "$DELETED_FILE_COUNT" -gt 0 ]; then
   echo ""
   echo "#########"
   echo "The following files have been deleted from the repo and will need to be removed manually from the server:"

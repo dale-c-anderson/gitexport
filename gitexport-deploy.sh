@@ -2,7 +2,7 @@
 
 REMOTE_DEPLOY_TOOL="gitexport-remote-deploy-tool.sh"
 REMOTE_DEPLOY_TOOL_SOURCE="https://raw.githubusercontent.com/dale-c-anderson/gitexport/master/$REMOTE_DEPLOY_TOOL"
-REMOTE_DEPLOY_TOOL_CHECKSUM='4e8d3ef5dc7ba511aa22f1b83cc83b69'
+REMOTE_DEPLOY_TOOL_CHECKSUM='f32beac3613d7e33b82e57052b5c2f77'
 
 if [ $# -ne 2 ]; then
   echo "Usage:  $(basename "$0") <gitExport.tar.gz> <targethost>"
@@ -68,15 +68,25 @@ fi
 # We do this (instead of using the local version) because (1) the local version isn't
 # actually used locally, and (2) we don't know where it was installed on the local machine.
 echo "Grabbing $REMOTE_DEPLOY_TOOL..."
-REMOTE_TOOL_TEMP=$("mktemp")
-wget -O "$REMOTE_TOOL_TEMP" "$REMOTE_DEPLOY_TOOL_SOURCE"
+REMOTE_TOOL_TEMP_DIR="$(mktemp --directory)"
+REMOTE_TOOL_TEMP="$REMOTE_TOOL_TEMP_DIR/$REMOTE_DEPLOY_TOOL"
+if test -f "$REMOTE_DEPLOY_TOOL_SOURCE"; then
+  REMOTE_TOOL_TEMP="$REMOTE_DEPLOY_TOOL_SOURCE"
+  echo "REMOTE_DEPLOY_TOOL_SOURCE is a local file: $REMOTE_TOOL_TEMP"
+elif [[ "$REMOTE_DEPLOY_TOOL_SOURCE" = "http"* ]]; then
+  : # Get it from the web
+  wget -O "$REMOTE_TOOL_TEMP" "$REMOTE_DEPLOY_TOOL_SOURCE"
+else
+  echo "Fatal: No valid REMOTE_DEPLOY_TOOL_SOURCE"
+  exit 1
+fi
 CHECKSUM="$(md5sum "$REMOTE_TOOL_TEMP"| awk '{print $1}')"
 if [[ "$CHECKSUM" != "$REMOTE_DEPLOY_TOOL_CHECKSUM" ]]; then
   echo -n "Warning: Checksum failed. Do you wish to continue? [y/N] "
   read -r CONFIRM
   if [[ "$CONFIRM" != "y" ]]; then
-    echo "Exiting."
-    exit 1
+    echo "A failed checksum usually means there is an updated version of GitExport available from https://github.com/dale-c-anderson/gitexport"
+    exit 0
   fi
 fi
 
@@ -97,7 +107,10 @@ scp "$REMOTE_TOOL_TEMP" "$DEPLOYTARGET:~/$REMOTE_DEPLOY_TOOL" || {
 # Execute the remote deploy script, and then remove it.
 # shellcheck disable=SC2088
 # shellcheck disable=SC2029
-ssh -t "$DEPLOY_HOST" "chmod +x './$REMOTE_DEPLOY_TOOL' && ./$REMOTE_DEPLOY_TOOL './$(basename "$TGZFILE")' '$DEPLOY_DIR' $DEPLOY_USER; rm './$REMOTE_DEPLOY_TOOL'"
-SSHRESULT=$?
-echo "$(basename "$0") finished with result: $SSHRESULT"
+if ssh -tq "$DEPLOY_HOST" "chmod +x './$REMOTE_DEPLOY_TOOL' && ./$REMOTE_DEPLOY_TOOL './$(basename "$TGZFILE")' '$DEPLOY_DIR' $DEPLOY_USER && rm './$REMOTE_DEPLOY_TOOL'"; then
+  : # 'No news' is good news.
+else
+  SSHRESULT=$?
+  echo "Remote deploy tool command exited with error code ${SSHRESULT}"
+fi
 exit $SSHRESULT
